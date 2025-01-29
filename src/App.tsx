@@ -1,3 +1,5 @@
+// Creating amazon dynamo db
+
 import { useEffect, useState } from 'react';
 import type { Schema } from '../amplify/data/resource';
 import { generateClient } from '@aws-amplify/api';
@@ -19,6 +21,15 @@ function App() {
     client.models.Todo.create({ content: window.prompt('What would you like to do?') });
   }
 
+  const fetchTodos = async () => {
+    const { data: items, errors } = await client.models.Todo.list();
+    alert(items.length + " todos fetched")
+  };
+
+  function deleteTodo(id: string) {
+    client.models.Todo.delete({ id })
+  }
+
   return (
       <Authenticator>
       {({signOut, user})=> (
@@ -27,7 +38,7 @@ function App() {
               <button onClick={createTodo}>+ new</button>
               <ul>
                 {todos.map((todo) => (
-                  <li key={todo.id}>{todo.content}</li>
+                  <li key={todo.id} onClick={() => deleteTodo(todo.id)}>{todo.content}</li>
                 ))}
               </ul>
               <div>
@@ -37,7 +48,8 @@ function App() {
                   Review next step of this tutorial.
                 </a>
               </div>
-              <div>
+              <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
+                <button onClick={fetchTodos}>Fetch Data</button>
                 <button onClick={signOut}>Sign out</button>
               </div>
             </main>
